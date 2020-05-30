@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+{% load general_tags %}
+
+{% block content %}
+<div class="container-fluid">
+        <div id="page-wrapper">
+            <div class="container">
+                <div class="card card-deck mx-auto col-auto">
+                    <div class="card-header font-weight-bold form-check-inline">Broker</div>
+                    <div class="card-body">
+                        <form action="#" method="POST">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                    <div class="font-weight-bold">
+                                    {{ field.label_tag }}
+                                    </div>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Broker List
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"> 
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>CNPJ</th>
+                    <th>Default</th>
+                    <th>Created at</th>
+                </tr>
+            </thead>
+            {% for object in objects_list %}
+                <tr>
+                    <td>{{ object.name }}</td>
+                    <td>{{ object.cnpj }}</td>
+                    <td>{{ object.is_default|yesNo }}</td>
+                    <td>{{ object.created_at|date:"d/m/Y" }}</td>
+                </tr>
+            {% empty %}
+            <tr>
+                    <td>-</td>
+                    <td>Empty</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

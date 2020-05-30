@@ -1,0 +1,30 @@
+{% load order_tags %}
+{% load general_tags %}
+{% for object in objects_list %}
+    <tr class="infinite-item">
+        <td><i class='{{ object.operation_type|operationtypeicon }}'></i> {{ object.operation_type|operationtype }}</td>
+        <td>{{ object.asset }}</td>
+        <td>{{ object.amount }}</td>
+        <td>{{ object.value|real_money_mask }}</td>
+        <td>{{ object.total|real_money_mask }}</td>
+        <td>{{ object.broker }}</td>
+        <td>{{ object.brokerrate|real_money_mask }}</td>
+        <td>{{ object.operated_at|date:"d/m/Y" }}</td>
+        <td>
+            <button type="button"
+                    class="btn btn-warning btn-sm js-update-object"
+                    data-url="{% url 'core:order_update' object.id %}">
+              <span class="glyphicon glyphicon-pencil"></span> Edit
+            </button>
+            <button type="button"
+                    class="btn btn-danger btn-sm js-delete-object"
+                    data-url="{% url 'core:order_delete' object.id %}">
+              <span class="glyphicon glyphicon-trash"></span> Del
+            </button>
+        </td>
+    </tr>
+{% empty %}
+    <tr>
+        <td colspan="12" class="text-center bg-warning">Empty</td>
+    </tr>
+{% endfor %}

@@ -1,0 +1,16 @@
+django-bootstrap-form
+django-jquery
+numpy
+pandas
+pandas_datareader
+django-pandas
+django-ajax-tables
+django-widget-tweaks
+setuptools
+apscheduler
+asgiref
+plotly
+pytz
+retrying
+six
+sqlparse

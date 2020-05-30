@@ -1,0 +1,40 @@
+{% extends 'base_outside.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="card card-login mx-auto mt-5">
+      <div class="card-header">Register</div>
+      <div class="card-body">
+        <form action="#" method="POST">
+          <fieldset>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="col-md-6">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                <ul class="errorlist alert-danger">
+                  <strong>
+                  {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                  </strong>
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+            </div>
+          </fieldset>
+          <div class="row">
+              <div class="col-md-6">
+                  <button type="submit" class="btn btn-success">Save</button>
+              </div>
+              <div class="col-md-6">
+                  <a class="btn btn-info" href="{% url 'accounts:login' %}">Back</a>
+              </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endblock %}

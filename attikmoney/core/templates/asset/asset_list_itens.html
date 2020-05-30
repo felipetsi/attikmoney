@@ -1,0 +1,27 @@
+{% load order_tags %}
+{% load general_tags %}
+{% for object in objects_list %}
+    <tr class="infinite-item">
+        <td>{{ object.type }}</td>
+        <td>{{ object.code }}</td>
+        <td>{{ object.name }}</td>
+        <td>{{ object.cnpj }}</td>
+        <td>{{ object.created_at|date:"d/m/Y" }}</td>
+        <td>
+            <button type="button"
+                    class="btn btn-warning btn-sm js-update-object"
+                    data-url="{% url 'core:asset_update' object.id %}">
+              <span class="glyphicon glyphicon-pencil"></span> Edit
+            </button>
+            <button type="button"
+                    class="btn btn-danger btn-sm js-delete-object"
+                    data-url="{% url 'core:asset_delete' object.id %}">
+              <span class="glyphicon glyphicon-trash"></span> Del
+            </button>
+        </td>
+    </tr>
+{% empty %}
+    <tr>
+        <td colspan="12" class="text-center bg-warning">Empty</td>
+    </tr>
+{% endfor %}

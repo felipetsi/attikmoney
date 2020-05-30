@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load general_tags %}
+
+{% block content %}
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"> 
+    <thead>
+        <tr>
+            <th>Total Operated</th>
+            <th>D. Total Buy</th>
+            <th>D. Total Sale</th>
+            <th>N. Total Buy</th>
+            <th>N. Total Sale</th>
+            <th>D. Income tax</th>
+            <th>N. Income tax</th>
+            <th>Period</th>
+        </tr>
+    </thead>
+        {% for _,record in DataFrame.iterrows %}
+            <tr>
+                {% for value in record %}
+                    <td>{{ value|real_money_mask  }}</td>
+                {% endfor %}
+            </tr>
+         {% endfor %}
+    </table>
+</div>
+{% endblock %}

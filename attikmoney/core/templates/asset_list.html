@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>
+    <button type="button" 
+            class="btn btn-primary js-add-object" 
+            data-url="{% url 'core:asset_add' %}" >
+        <span class="glyphicon glyphicon-plus"></span>
+        Add
+    </button>
+</p>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Asset List
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"> 
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>CNPJ</th>
+                        <th>Created at</th>
+                    </tr>
+                </thead>
+                <tbody class="infinite-container">
+                    {% include 'asset/asset_list_itens.html' %}
+                </tbody>
+            </table>
+        </div>
+
+    <!-- Begin Modal -->
+    <div class="modal fade" id="modal-add" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+    </div>
+    <div class="loading" style="display: none;">
+        Loading...
+    </div>
+
+    {% if objects_list.has_next %}
+        <a class="infinite-more-link" href="?page={{ objects_list.next_page_number }}">More</a>
+    {% endif %}
+</div >
+{% endblock %}

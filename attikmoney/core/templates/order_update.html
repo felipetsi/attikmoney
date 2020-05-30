@@ -1,0 +1,18 @@
+{% load widget_tweaks %}
+
+<form method="POST" action="{% url 'core:order_update' form.instance.pk %}" class="js-update-object-form">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h4 class="modal-title">Update a order</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {% include 'order_data.html' %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Save</button>
+    </div>
+</form>
