@@ -1,8 +1,9 @@
 #from django.contrib import admin
 from django.urls import path
 from .views import order_list, order_add, order_update, report_average, report_daily_profit_loss, income_tax
-from .views import report_income_tax_position, report_income_tax_profit_loss, report_income_tax_non_taxable_profit_loss, report_amount_income_tax_paid
+from .views import report_income_tax_position, report_income_tax_profit_loss, report_income_tax_non_taxable_profit_loss, report_amount_income_tax_paid, report_performance
 from .views import asset_type, yield_type, dividend_yield, broker, brokerraterule, order_delete, asset_add, asset_update, asset_delete, asset_list
+from .views import importtrades, handle_uploaded_file
 
 app_name = 'core'
 urlpatterns = [
@@ -23,9 +24,13 @@ urlpatterns = [
     path('report_income_tax_profit_loss.html', report_income_tax_profit_loss, name='report_income_tax_profit_loss'),
     path('report_income_tax_non_taxable_profit_loss.html', report_income_tax_non_taxable_profit_loss, name='report_income_tax_non_taxable_profit_loss'),
     path('report_amount_income_tax_paid.html', report_amount_income_tax_paid, name='report_amount_income_tax_paid'),
+    path('report_performance.html', report_performance, name='report_performance'),
     path('asset_type.html', asset_type, name='asset_type'),
     path('yield_type.html', yield_type, name='yield_type'),
     path('dividend_yield.html', dividend_yield, name='dividend_yield'),
     path('broker.html', broker, name='broker'),
     path('brokerraterule.html', brokerraterule, name='brokerraterule'),
+
+    path('importtrades.html', importtrades, name='importtrades'),
+    path('importtrades/add', handle_uploaded_file, name='handle_uploaded_file'),
 ]

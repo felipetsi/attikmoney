@@ -92,7 +92,7 @@ DATABASES = {
         'USER': 'fc_user',
         'PASSWORD': 'DWerywuqai*#32130a;dsa]sadID',
         'HOST': '127.0.0.1',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 

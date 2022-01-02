@@ -38,6 +38,10 @@ class PositionManager (models.Manager):
     def search(self, query):
         return self.get_queryset().filter(name__icontains=query)
 
+class WalletManager (models.Manager):
+    def search(self, query):
+        return self.get_queryset().filter(name__icontains=query)
+
 class TaxManager (models.Manager):
     def search(self, query):
         return self.get_queryset().filter(name__icontains=query)
@@ -109,6 +113,7 @@ class DividendYield(models.Model):
     # class Meta:
     #     unique_together = (('user', 'asset'),)
 
+# EXCLUIR ESTA TABELA ABAIXO, Ñ ESTÁ MAIS EM USO
 class Balance(models.Model):
     CHOICE_IS_DEFAULT = [
         ('n','Normal'),
@@ -190,18 +195,34 @@ class BrokerRateRule(models.Model):
 
 class Position(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     type = models.ForeignKey(AssetType, on_delete=models.CASCADE)
     balance = models.FloatField('Balance')
     broker = models.ForeignKey(Broker, on_delete=models.CASCADE)
-    regarding_at = models.DateTimeField('Regarding at')
+    regarding_at = models.DateField('Regarding at')
     created_at = models.DateTimeField('Created at', auto_now_add=True)
     objects = PositionManager()
-        
-    # def __str__(self):
-    #     return self.value
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['regarding_at']
+
+class Wallet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    risk_diversified = models.FloatField('Risk Diversified')
+    risk_systemic = models.FloatField('Risk Systemic')
+    regarding_at = models.DateField('Regarding at')
+    created_at = models.DateTimeField('Created at', auto_now_add=True)
+    objects = WalletManager()
+
+    class Meta:
+        ordering = ['regarding_at']
+
+class WalletAsset(models.Model):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    amuont = models.FloatField('Amount')
+    balance = models.FloatField('Balance')
+    broker = models.ForeignKey(Broker, on_delete=models.CASCADE)
 
 class Tax(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)

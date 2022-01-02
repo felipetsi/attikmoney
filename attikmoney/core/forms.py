@@ -44,3 +44,8 @@ class BrokerRateRuleForm(forms.ModelForm):
     class Meta:
         model = BrokerRateRule
         fields = ['ordertype', 'assettype', 'broker', 'greaterthan', 'lessthan', 'rate']
+
+class ImportTradesForm(forms.Form):
+    #title = forms.CharField(max_length=50)
+    #enctype="multipart/form-data"
+    file = forms.FileField()

@@ -14,7 +14,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>@ttik Money</title>
+  <title>Attik Money</title>
 
   <!-- Custom styles for this template-->
   <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
@@ -28,7 +28,7 @@
 
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-    <a class="navbar-brand mr-1" href="{%  url 'dashboard:dashboard' %}">@ttik Money</a>
+    <a class="navbar-brand mr-1" href="{%  url 'dashboard:dashboard' %}">Attik Money</a>
 
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
@@ -136,6 +136,8 @@
           <h6 class="dropdown-header">Income Tax:</h6>
           <a class="dropdown-item" href="{% url 'report:report_income_tax_month' %}">Monthly</a>
           <a class="dropdown-item" href="{% url 'core:report_amount_income_tax_paid' %}">Paid</a>
+          <h6 class="dropdown-header">Performance:</h6>
+          <a class="dropdown-item" href="{% url 'report:report_performance' %}">Performance</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -150,6 +152,7 @@
           <a class="dropdown-item" href="{% url 'core:broker' %}">Broker</a>
           <a class="dropdown-item" href="{% url 'core:brokerraterule' %}">Broker Rate</a>
           <a class="dropdown-item" href="{% url 'core:yield_type' %}">Yield Type</a>
+          <a class="dropdown-item" href="{% url 'core:importtrades' %}">Import Trade</a>
         </div>
       </li>
     </ul>
@@ -182,7 +185,7 @@
       <footer class="sticky-footer">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright © @ttik</span>
+            <span>Copyright © Attik</span>
           </div>
         </div>
       </footer>

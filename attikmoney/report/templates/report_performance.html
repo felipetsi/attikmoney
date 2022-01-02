@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load general_tags %}
+
+{% block content %}
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"> 
+    <thead>
+        <tr>
+            <th>risk_diversified</th>
+            <th>risk_systemic</th>
+            <th>Asset</th>
+            <th>Amount</th>
+            <th>Balance</th>
+            <th>Broker</th>
+            <th>Regarding at</th>
+        </tr>
+    </thead>
+        {% for _,record in DataFrame.iterrows %}
+            <tr>
+                {% for value in record %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+         {% endfor %}
+    </table>
+</div>
+{% endblock %}

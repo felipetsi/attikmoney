@@ -3,11 +3,12 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.loader import render_to_string
-from attikmoney.core.models import Order, Balance, AssetType, Asset, Broker, Position
+from pandas.core.frame import DataFrame
+from attikmoney.core.models import Order, Balance, AssetType, Asset, Broker, Position, DividendYield, Wallet, WalletAsset
 from django.db.models.functions import Floor
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic.list import ListView
-import datetime
+from datetime import date, datetime
 import pandas as pd
 from django.db.models import Avg, Count, Min, Sum
 
@@ -293,58 +294,134 @@ def report_income_tax_month(request):
         template_name = 'report_income_tax_month.html'
         return render(request,template_name,{'DataFrame': context})
 
-@login_required
-def report_position(request):
-        
+#@login_required
+def update_wallet(request):
         user = request.user
+        wallet_row = Wallet(
+                user              = user,
+                risk_diversified  = 1,
+                risk_systemic     = 2,
+                regarding_at      = datetime.now(),
+                created_at        = datetime.now()
+        )
+        wallet_row.save()
 
-        columns_name = ['asset','broker','type','balance']
-        context = pd.DataFrame(columns=columns_name)
-        
-        # Get all Brokers
         broker_list = Broker.objects.filter(user=user).values('id')
         for broker_loop in broker_list:
                 # Get All Assets
                 asset_list = Asset.objects.filter(user=user).values('id','type','code').order_by('code').distinct()
                 # Check balance of each Asset
                 for asset in asset_list:
+                        assetId = asset['id']
                         assetCode = asset['code']
                         assetType = AssetType.objects.get(pk=asset['type'])
                         broker = Broker.objects.get(pk=broker_loop['id'])
-                        # Check the balance of each Asset
-                        balance_buy = Order.objects.filter(
+                        # Check the balance_amount of each Asset
+                        balance_amount_buy = Order.objects.filter(
                                 user=user, 
                                 operation_type='b',
-                                asset=asset['id'],
+                                asset=assetId,
                                 broker=broker
                                 ).aggregate(Sum('amount'))
 
-                        balance_sale = Order.objects.filter(
+                        balance_amount_sale = Order.objects.filter(
                                 user=user, 
                                 operation_type='s',
-                                asset=asset['id'],
+                                asset=assetId,
                                 broker=broker
                                 ).aggregate(Sum('amount'))
                         
                         try:
-                                balance = balance_buy['amount__sum'] - balance_sale['amount__sum']
+                                balance_amount = balance_amount_buy['amount__sum'] - balance_amount_sale['amount__sum']
                         except:
-                                if balance_sale['amount__sum'] == None:
-                                        balance_sale['amount__sum'] = 0
-                                if balance_buy['amount__sum'] == None:
-                                        balance_buy['amount__sum'] = 0
+                                if balance_amount_sale['amount__sum'] == None:
+                                        balance_amount_sale['amount__sum'] = 0
+                                if balance_amount_buy['amount__sum'] == None:
+                                        balance_amount_buy['amount__sum'] = 0
                                 
-                                balance = balance_buy['amount__sum'] - balance_sale['amount__sum']
+                                balance_amount = balance_amount_buy['amount__sum'] - balance_amount_sale['amount__sum']
                                 
-                        if balance != 0:
-                                context = context.append(pd.DataFrame([[assetCode,broker,assetType,balance]], columns=columns_name))
-                                position_row = Position(
-                                        user=user, 
-                                        type=assetType,
-                                        balance=balance,
-                                        broker=broker
+                        if balance_amount != 0:
+                                walletAsset_row = WalletAsset(
+                                        wallet  = wallet_row,
+                                        asset   = assetId,
+                                        amuont  = balance_amount,
+                                        balance = 10,
+                                        broker  = broker
                                 )
-                                position_row.save()
+                                walletAsset_row.save()
+        return ()
+
+@login_required
+def check_wallet_position(request):
+        
+        user = request.user
+        columns_name = ['risk_diversified','risk_systemic','asset','amount','balance','broker','regarding_at','created_at']
+        context = pd.DataFrame(columns=columns_name)
+
+        try:
+                lastPosition = Wallet.objects.filter(user=user).values('id', 'risk_diversified', 'risk_systemic', 'regarding_at', 'created_at').last()
+                lastPositionId = lastPosition['id']
+                try:
+                        positionAssetList = WalletAsset.objects.filter(id__wallet= lastPositionId).values('wallet','asset','amount','balance','broker')
+                        for positionAsset in positionAssetList:
+                                assetId = positionAsset['asset']
+                                asset = Asset.objects.filter(id=assetId).values('code')
+                                context = context.append(pd.DataFrame([[lastPosition['risk_diversified'],lastPosition['risk_systemic'],positionAsset['code'],positionAsset['amount'],positionAsset['balance'],positionAsset['broker']]], columns=columns_name))
+                except:
+                        context.append(pd.DataFrame([['no data','no data','no data','no data','no data','no data','no data','no data']], columns=columns_name))
+        except:
+                context.append(pd.DataFrame([['no data','no data','no data','no data','no data','no data','no data','no data']], columns=columns_name))
+        
+        return (context)
+
+@login_required
+def report_position(request):
+        # Get Position
+        context = check_wallet_position(request)
+        # Adjust columns needed
+        context = context.drop(['asset_id'], axis=1)
+        
+        template_name = 'report_position.html'
+        return render(request,template_name,{'DataFrame': context})
+
+@login_required
+def report_performance(request):
+        # Get Position
+        context = check_wallet_position(request)
 
         template_name = 'report_position.html'
         return render(request,template_name,{'DataFrame': context})
+
+####################################################
+def amountOrders(user):
+        context = {}
+        lastDayPos = Position.objects.filter(user = user).values('created_at__day').last()
+        lastMontPos = Position.objects.filter(user = user).values('created_at__month').last()
+        lastYearPos = Position.objects.filter(user = user).values('created_at__year').last()
+
+        try:
+                context['wallet'] = Position.objects.filter(
+                        user = user, 
+                        created_at__day = lastDayPos['created_at__day'], 
+                        created_at__month = lastMontPos['created_at__month'], 
+                        created_at__year = lastYearPos['created_at__year']
+                ).values('id').count()
+        except:
+                context['wallet'] = 0
+
+        context['orderDayB'] = Order.objects.filter(user = user, operation_type = 'b', operated_at = date.today()).values('id').count()
+        context['orderDayS'] = Order.objects.filter(user = user, operation_type = 's', operated_at = date.today()).values('id').count()
+        
+        orders = Order.objects.filter(
+                user = user, 
+                operated_at__month = datetime.now().month, 
+                operated_at__year = datetime.now().year
+        ).values('value', 'amount')
+
+        context['operatedMonth'] = 0
+        
+        for order in orders:
+                context['operatedMonth'] += order['value'] * order['amount']
+        
+        return(context)

@@ -3,12 +3,13 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.loader import render_to_string
-from .forms import forms, TypeAssetForm, AssetForm, DividendYieldForm, YieldTypeForm, BrokerForm, OrderForm, BrokerRateRuleForm
+from .forms import forms, TypeAssetForm, AssetForm, DividendYieldForm, YieldTypeForm, BrokerForm, OrderForm, BrokerRateRuleForm, ImportTradesForm
 from .models import AssetType, Asset, YieldType, DividendYield, Balance, Broker, Order, BrokerRateRule, Tax, Language
 from django.db.models.functions import Floor
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic.list import ListView
 from datetime import date
+import pandas as pd
 
 #from django.db.models import DecimalField
 #from django.db.models.functions import Cast
@@ -131,6 +132,10 @@ def report_income_tax_non_taxable_profit_loss(request):
 @login_required
 def report_amount_income_tax_paid(request):
         return render(request, 'report_amount_income_tax_paid.html')
+
+@login_required
+def report_performance(request):
+        return render(request, 'report_performance.html')
 
 def asset_list(request):
         context = {}
@@ -323,3 +328,38 @@ def brokerraterule(request):
         context['objects_list'] = BrokerRateRule.objects.filter(user=user)
         template_name = 'brokerraterule.html'
         return render(request,template_name, context)
+
+@login_required
+def handle_uploaded_file(file):
+        df=pd.DataFrame()
+        df = pd.read_excel(file)
+        for i in range(df.index.stop):
+                if (type(df.iloc[i][1]) == int):
+                        for f in range(14):
+                                id = df.iloc[i][1]
+                                stock = df.iloc[i][2]
+                                operation_type = df.iloc[i][3]
+                                volume = df.iloc[i][4]
+                                value_in = df.iloc[i][5]
+                                value_out = df.iloc[i][9]
+                                print("Id:"+str(id)+ "\n"
+                                        "Stock:"+str(stock)+ "\n"
+                                        "Op. Type:"+str(operation_type)+ "\n"
+                                        "Volume:"+str(volume)+ "\n"
+                                        "Value in:"+str(value_in)+ "\n"
+                                        "value_out:"+str(value_out))
+
+@login_required
+def importtrades(request):
+        context = {}
+        if request.method == 'POST':
+                form = ImportTradesForm(request.POST, request.FILES)
+                if form.is_valid():
+                        handle_uploaded_file(request.FILES['file'])
+                        messages.success(request, 'File imported as successful')
+        else:
+                form = ImportTradesForm()
+        context['form'] = form
+        template_name = 'importtrades.html'
+        return render(request,template_name,context)
+
